@@ -1,0 +1,80 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Logs
+*.log
+logs/
+analytics.log
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+dev.db
+test.db
+
+# Local development
+.env
+.env.local
+.env.*.local
+
+# Cache
+.cache/
+cache/
+
+# Dependencies lock files (optional - uncomment if using pip-compile)
+# requirements.lock
+
+# Temp files
+tmp/
+temp/
+*.tmp
+
+# OS
+Thumbs.db
+.DS_Store
