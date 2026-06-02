@@ -1,13 +1,20 @@
 from __future__ import annotations
 
+import os
 import logging
 import time
+import sys
 from contextlib import asynccontextmanager
 
 import requests
 from fastapi import FastAPI, Request
 from starlette.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
+
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PARENT_DIR = os.path.dirname(CURRENT_DIR)
+if PARENT_DIR not in sys.path:
+    sys.path.insert(0, PARENT_DIR)
 
 from backend.cache.redis_client import redis_cache
 from backend.config import get_settings
