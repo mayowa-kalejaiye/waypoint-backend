@@ -1,1 +1,35 @@
-frontend/ 
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+analytics.log
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+dev.db
+test.db
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Build & Dependencies
+node_modules/
+.next/
+dist/
+build/
