@@ -17,46 +17,16 @@ for _path in (_BACKEND_DIR, _PROJECT_DIR):
     if _path not in sys.path:
         sys.path.insert(0, _path)
 
-try:
-    from cache.redis_client import redis_cache
-except ModuleNotFoundError:
-    from .cache.redis_client import redis_cache
-try:
-    from config import get_settings
-except ModuleNotFoundError:
-    from .config import get_settings
-try:
-    from db.database import create_db_and_tables
-except ModuleNotFoundError:
-    from .db.database import create_db_and_tables
-try:
-    from routers.launch import router as launch_router
-except ModuleNotFoundError:
-    from .routers.launch import router as launch_router
-try:
-    from routers.curriculum import router as curriculum_router
-except ModuleNotFoundError:
-    from .routers.curriculum import router as curriculum_router
-try:
-    from routers.interactions import router as interactions_router
-except ModuleNotFoundError:
-    from .routers.interactions import router as interactions_router
-try:
-    from routers.feedback import router as feedback_router
-except ModuleNotFoundError:
-    from .routers.feedback import router as feedback_router
-try:
-    from models import moat_features as _ # noqa: F401
-except ModuleNotFoundError:
-    from .models import moat_features as _ # noqa: F401
-try:
-    from routers.rank import router as rank_router
-except ModuleNotFoundError:
-    from .routers.rank import router as rank_router
-try:
-    from routers.canvas import router as canvas_router
-except ModuleNotFoundError:
-    from .routers.canvas import router as canvas_router
+from cache.redis_client import redis_cache
+from config import get_settings
+from db.database import create_db_and_tables
+from routers.launch import router as launch_router
+from routers.curriculum import router as curriculum_router
+from routers.interactions import router as interactions_router
+from routers.feedback import router as feedback_router
+from models import moat_features as _ # noqa: F401
+from routers.rank import router as rank_router
+from routers.canvas import router as canvas_router
 
 
 settings = get_settings()
