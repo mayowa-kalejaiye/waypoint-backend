@@ -11,20 +11,14 @@ from fastapi import FastAPI, Request
 from starlette.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-PARENT_DIR = os.path.dirname(CURRENT_DIR)
-if PARENT_DIR not in sys.path:
-    sys.path.insert(0, PARENT_DIR)
-
-from backend.cache.redis_client import redis_cache
-from backend.config import get_settings
-from backend.db.database import create_db_and_tables
-from backend.routers.launch import router as launch_router
-from backend.routers.curriculum import router as curriculum_router
-from backend.routers.interactions import router as interactions_router
-from backend.routers.feedback import router as feedback_router
-# Import moat feature models to ensure they're registered in SQLModel metadata
-from backend.models import moat_features as _  # noqa: F401
+from cache.redis_client import redis_cache
+from config import get_settings
+from db.database import create_db_and_tables
+from routers.launch import router as launch_router
+from routers.curriculum import router as curriculum_router
+from routers.interactions import router as interactions_router
+from routers.feedback import router as feedback_router
+from models import moat_features as _  # noqa: F401
 
 
 settings = get_settings()
@@ -105,9 +99,9 @@ app.include_router(curriculum_router)
 app.include_router(interactions_router)
 app.include_router(feedback_router)
 app.include_router(launch_router)
-from backend.routers.rank import router as rank_router
+from routers.rank import router as rank_router
 app.include_router(rank_router)
-from backend.routers.canvas import router as canvas_router
+from routers.canvas import router as canvas_router
 app.include_router(canvas_router)
 
 
@@ -119,8 +113,8 @@ def health() -> dict[str, str]:
 @app.get("/api/v1/health/dependencies")
 def health_dependencies() -> dict[str, dict[str, str]]:
     """Check health of external dependencies (Redis, NVIDIA NIM)."""
-    from backend.cache.redis_client import redis_cache
-    from backend.services.llm_client import llm_service
+    from cache.redis_client import redis_cache
+    from services.llm_client import llm_service
     
     redis_status = "ok"
     redis_message = ""
