@@ -11,6 +11,10 @@ from fastapi import FastAPI, Request
 from starlette.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 
+_BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
+if _BACKEND_DIR not in sys.path:
+    sys.path.insert(0, _BACKEND_DIR)
+
 from cache.redis_client import redis_cache
 from config import get_settings
 from db.database import create_db_and_tables
