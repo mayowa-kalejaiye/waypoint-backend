@@ -13,20 +13,29 @@ from fastapi.middleware.cors import CORSMiddleware
 
 _BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
 _PROJECT_DIR = os.path.dirname(_BACKEND_DIR)
-for _path in (_BACKEND_DIR, _PROJECT_DIR):
+for _path in (_BACKEND_DIR, _PROJECT_DIR, os.getcwd()):
     if _path not in sys.path:
         sys.path.insert(0, _path)
 
-from cache.redis_client import redis_cache
-from config import get_settings
-from db.database import create_db_and_tables
-from routers.launch import router as launch_router
-from routers.curriculum import router as curriculum_router
-from routers.interactions import router as interactions_router
-from routers.feedback import router as feedback_router
-from models import moat_features as _ # noqa: F401
-from routers.rank import router as rank_router
-from routers.canvas import router as canvas_router
+import importlib.util
+
+def _load_module(name, rel_path):
+    spec = importlib.util.spec_from_file_location(name, os.path.join(_BACKEND_DIR, rel_path))
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[name] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+redis_cache = _load_module("cache.redis_client", "cache/redis_client.py")
+get_settings = _load_module("config", "config.py").get_settings
+create_db_and_tables = _load_module("db.database", "db/database.py").create_db_and_tables
+launch_router = _load_module("routers.launch", "routers/launch.py").router
+curriculum_router = _load_module("routers.curriculum", "routers/curriculum.py").router
+interactions_router = _load_module("routers.interactions", "routers/interactions.py").router
+feedback_router = _load_module("routers.feedback", "routers/feedback.py").router
+moat_features = _load_module("models.moat_features", "models/moat_features.py")
+rank_router = _load_module("routers.rank", "routers/rank.py").router
+canvas_router = _load_module("routers.canvas", "routers/canvas.py").router
 
 
 settings = get_settings()
