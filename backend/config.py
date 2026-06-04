@@ -34,8 +34,7 @@ class Settings(BaseSettings):
     redis_username: str | None = Field(default=None, alias="REDIS_USERNAME")
     redis_key_prefix: str = Field(default="", alias="REDIS_KEY_PREFIX")
     cors_allow_origins: str = Field(
-        default="http://localhost:3000,http://127.0.0.1:3000",
-        alias="CORS_ALLOW_ORIGINS",
+    default="http://localhost:3000,http://127.0.0.1:3000,https://waypointapp.vercel.app",
     )
 
     generation_rate_limit_enabled: bool = Field(default=True, alias="GEN_RATE_LIMIT_ENABLED")
