@@ -65,7 +65,6 @@ test.db
 
 # Cache
 .cache/
-cache/
 
 # Dependencies lock files (optional - uncomment if using pip-compile)
 # requirements.lock
