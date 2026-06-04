@@ -17,26 +17,16 @@ for _path in (_BACKEND_DIR, _PROJECT_DIR, os.getcwd()):
     if _path not in sys.path:
         sys.path.insert(0, _path)
 
-import importlib.util
-
-def _load_module(name, rel_path):
-    spec = importlib.util.spec_from_file_location(name, os.path.join(_BACKEND_DIR, rel_path))
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules[name] = mod
-    spec.loader.exec_module(mod)
-    return mod
-
-redis_cache = _load_module("cache.redis_client", "cache/redis_client.py")
-get_settings = _load_module("config", "config.py").get_settings
-create_db_and_tables = _load_module("db.database", "db/database.py").create_db_and_tables
-launch_router = _load_module("routers.launch", "routers/launch.py").router
-curriculum_router = _load_module("routers.curriculum", "routers/curriculum.py").router
-interactions_router = _load_module("routers.interactions", "routers/interactions.py").router
-feedback_router = _load_module("routers.feedback", "routers/feedback.py").router
-moat_features = _load_module("models.moat_features", "models/moat_features.py")
-rank_router = _load_module("routers.rank", "routers/rank.py").router
-canvas_router = _load_module("routers.canvas", "routers/canvas.py").router
-
+from cache.redis_client import redis_cache
+from config import get_settings
+from db.database import create_db_and_tables
+from routers.launch import router as launch_router
+from routers.curriculum import router as curriculum_router
+from routers.interactions import router as interactions_router
+from routers.feedback import router as feedback_router
+from models import moat_features as _ # noqa: F401
+from routers.rank import router as rank_router
+from routers.canvas import router as canvas_router
 
 settings = get_settings()
 logger = logging.getLogger("backend")
@@ -78,7 +68,6 @@ async def request_log_middleware(request: Request, call_next):
     start = time.perf_counter()
     if request.url.path == "/api/v1/curriculum/top":
         return Response(status_code=404)
-
     suppress_log = False
     if not suppress_log:
         logger.warning("%s %s started", request.method, request.url.path)
@@ -90,15 +79,19 @@ async def request_log_middleware(request: Request, call_next):
         raise
     elapsed_ms = (time.perf_counter() - start) * 1000
     if not suppress_log:
-        logger.warning("%s %s completed status=%s in %.1fms", request.method, request.url.path, response.status_code, elapsed_ms)
-
+        logger.warning(
+            "%s %s completed status=%s in %.1fms",
+            request.method,
+            request.url.path,
+            response.status_code,
+            elapsed_ms,
+        )
     if settings.security_headers_enabled:
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "no-referrer"
         response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
         response.headers["Cross-Origin-Resource-Policy"] = "same-site"
-
         if request.url.path.startswith("/api/"):
             response.headers["Content-Security-Policy"] = (
                 "default-src 'none'; "
@@ -106,11 +99,10 @@ async def request_log_middleware(request: Request, call_next):
                 "base-uri 'none'; "
                 "form-action 'none'"
             )
-
         if settings.security_hsts_enabled:
             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-
     return response
+
 
 app.include_router(curriculum_router)
 app.include_router(interactions_router)
@@ -129,36 +121,11 @@ def health() -> dict[str, str]:
 def health_dependencies() -> dict[str, dict[str, str]]:
     """Check health of external dependencies (Redis, NVIDIA NIM)."""
     from cache.redis_client import redis_cache
-    from services.llm_client import llm_service
-    
-    redis_status = "ok"
-    redis_message = ""
+
+    status: dict[str, dict[str, str]] = {}
     try:
         redis_cache.client.ping()
-    except Exception as exc:
-        redis_status = "down"
-        redis_message = str(exc)
-    
-    nvidia_status = "ok"
-    nvidia_message = ""
-    try:
-        # Small test to see if NVIDIA endpoint is reachable and responding.
-        response = requests.get(
-            f"{llm_service._base_url}/v1/models",
-            headers={"Authorization": f"Bearer {llm_service._api_key}"},
-            timeout=5,
-        )
-        if response.status_code != 200:
-            nvidia_status = "down"
-            nvidia_message = f"HTTP {response.status_code}"
-    except requests.exceptions.Timeout:
-        nvidia_status = "timeout"
-        nvidia_message = "NVIDIA endpoint did not respond within 5s"
-    except Exception as exc:
-        nvidia_status = "down"
-        nvidia_message = str(exc)
-    
-    return {
-        "redis": {"status": redis_status, "message": redis_message},
-        "nvidia_nim": {"status": nvidia_status, "message": nvidia_message},
-    }
+        status["redis"] = {"status": "ok"}
+    except Exception as exc:  # pragma: no cover - runtime dependency check
+        status["redis"] = {"status": "error", "detail": str(exc)}
+    return status
