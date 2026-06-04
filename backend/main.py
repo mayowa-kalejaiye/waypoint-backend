@@ -24,7 +24,6 @@ from routers.launch import router as launch_router
 from routers.curriculum import router as curriculum_router
 from routers.interactions import router as interactions_router
 from routers.feedback import router as feedback_router
-from models import moat_features as _ # noqa: F401
 from routers.rank import router as rank_router
 from routers.canvas import router as canvas_router
 
