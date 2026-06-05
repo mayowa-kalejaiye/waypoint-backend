@@ -51,7 +51,12 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s [%(nam
 
 cors_origins = [origin.strip() for origin in settings.cors_allow_origins.split(",") if origin.strip()]
 if not cors_origins:
-    cors_origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    cors_origins = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://waypointapp.vercel.app",
+        "https://waypointapp.vercel.app/",
+    ]
 
 app.add_middleware(
     CORSMiddleware,
